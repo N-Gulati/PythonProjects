@@ -19,9 +19,9 @@ def send_ssh_cmd(__cmd__, __stdin__ = None, __username__ = None, __password__= N
     #unpacks the dict 
     if __Packet__ is not None:
         print("unpacking connection packet")
-        __username__ = __packet__['username']
-        __password__ = __packet__['password']
-        __IP__ = __packet__['host']
+        __username__ = __Packet__['username']
+        __password__ = __Packet__['password']
+        __IP__ = __Packet__['host']
 
     ##Method
     try:
