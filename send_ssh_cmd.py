@@ -1,3 +1,6 @@
+### send_ss_cmd.py
+#created by N.Gulati
+
 def send_ssh_cmd(__cmd__, __stdin__ = None, __username__ = None, __password__= None , __IP__ = None , __port__ = None, __Packet__ = None, __openterminal__ = False):
     #__cmd__ : (string) command to be transitted to the Remote Machine using SSH
     #__username__ : (string) username for login for SSH to Remote Machine
@@ -12,8 +15,9 @@ def send_ssh_cmd(__cmd__, __stdin__ = None, __username__ = None, __password__= N
         import paramiko
         import numpy as np
         import time
-    except:
+    except Exception as E:
         print("error importing modules")
+        print(E)
         return
   
     #unpacks the dict 
@@ -33,8 +37,9 @@ def send_ssh_cmd(__cmd__, __stdin__ = None, __username__ = None, __password__= N
         if __openterminal__ == False:
             stdin, stdout, stderr = ssh_client.exec_command(__cmd__) 
         else:
-            stdin, stdout, stderr = ssh_client.exec_command(f'export DISPLAY=:0.0 && gnome-terminal -- bash -login -c "{__cmd__}; exec bash"')
-
+            command = 'export DISPLAY=:0.0 && gnome-terminal -- bash -login -c "' + __cmd__ + '; exec bash"'
+            print(command)
+            stdin, stdout, stderr = ssh_client.exec_command(command)
         execution_time = time.time() #store execution time for return
 
         #option to supply an input to stdin
@@ -65,3 +70,6 @@ def send_ssh_cmd(__cmd__, __stdin__ = None, __username__ = None, __password__= N
         print(f"Error: {e}")
 
     return stdout, stderr, execution_time
+
+
+send_ssh_cmd("ls", __username__ = "pi", __password__ = '3Preunion', __IP__ = "192.168.86.49")
