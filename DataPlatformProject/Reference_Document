@@ -1,0 +1,231 @@
+################################################################################
+# 1) IMPORTING DATA (Import_Functions.py)
+################################################################################
+
+# Instantiate the import class
+importer = Import_Functions()
+
+# 1A) Import from CSV
+df_csv = importer.import_csv(
+    file_path="data.csv",
+    delimiter=",",
+    parse_dates=["timestamp"]
+)
+print("Data (CSV):\n", df_csv.head())
+
+# 1B) Import from Excel
+df_excel = importer.import_excel(
+    file_path="data.xlsx",
+    sheet_name="Sheet1"
+)
+print("Data (Excel):\n", df_excel.head())
+
+# 1C) Import from JSON
+df_json = importer.import_json(
+    file_path="data.json"
+)
+print("Data (JSON):\n", df_json.head())
+
+# 1D) Import from Text
+df_text = importer.import_text(
+    file_path="data.txt",
+    delimiter="\t",
+    header=True
+)
+print("Data (Text):\n", df_text.head())
+
+
+################################################################################
+# 2) DATA ANALYSIS (Analysis_Functions.py)
+################################################################################
+
+#Instantiate the analysis class
+analysis = Analysis_Functions()
+
+# 2A) Descriptive Statstics
+# Compute basic descriptive stats for a DataFrame (e.g., from df_csv)
+basic_stats = analysis.descriptive_statistics(df_csv)
+print("Basic Descriptive Stats:\n", basic_stats)
+
+# Get extended statistics with skew, kurtosis, etc.
+extended_stats = analysis.descriptive_statistics(
+    df_csv, 
+    columns=["Voltage", "Pressure"], 
+    additional_stats=True
+)
+print("Extended Descriptive Stats:\n", extended_stats)
+
+# 2B) FFT
+fft_results = analysis.analyze_fft(
+    df=df_csv,
+    columns=["Voltage"],
+    sampling_rate=1000  # Hz
+)
+# fft_results["Voltage"] => (freq_array, fft_magnitude_array)
+print("FFT Results:\n", fft_results)
+
+# 2C) Power Spectral Density (Welch)
+psd_results = analysis.analyze_psd_welch(
+    df=df_csv,
+    columns=["Voltage"],
+    sampling_rate=1000,
+    nperseg=512
+)
+# psd_results["Voltage"] => (freq_array, psd_array)
+print("Welch PSD Results:\n", psd_results)
+
+# 2D) STFT
+stft_results = analysis.analyze_stft(
+    df=df_csv,
+    columns=["Voltage"],
+    sampling_rate=1000,
+    nperseg=256
+)
+# stft_results["Voltage"] => (frequency_bins, time_bins, Zxx_matrix)
+print("STFT Results:\n", stft_results)
+
+# 2E) Wavelet Transform
+wavelet_results = analysis.analyze_wavelet(
+    df=df_csv,
+    columns=["Voltage"],
+    wavelet="morl"  # e.g., "mexh", "cmor", etc.
+)
+# wavelet_results["Voltage"] => (cwt_matrix, scales)
+print("Wavelet Transform Results:\n", wavelet_results)
+
+# 2F) Peak Detection
+peaks_detected = analysis.detect_peaks(
+    df=df_csv,
+    columns=["Voltage"],
+    height=0.5,    # Minimum height of peaks
+    distance=10    # Minimum distance between peaks in samples
+)
+# peaks_detected["Voltage"] => { "peaks": [...], "properties": {...} }
+print("Peaks Detected:\n", peaks_detected)
+
+# 2G) Filtering
+df_filtered = analysis.filter_data(
+    df=df_csv,
+    columns=["Voltage"],
+    filter_type="lowpass",
+    cutoff_freq=60,   # e.g., removing 60 Hz line noise
+    order=4,
+    sampling_rate=1000
+)
+print("Filtered Data:\n", df_filtered.head())
+
+
+################################################################################
+# 3) DATA MANIPULATION (Data_Manipulation_Functions.py)
+################################################################################
+
+manipulator = Data_Manipulation_Functions()
+
+# 3A) transform_data
+# Example: Convert Voltage to Current via I = V/R
+resistance = 10.0  # Ohms
+df_with_current = manipulator.transform_data(
+    df=df_csv,
+    columns=["Voltage"],
+    transform_func=lambda v: v / resistance,
+    new_column_name="Current"
+)
+print("Data with Current:\n", df_with_current.head())
+
+# Overwrite multiple columns in place
+manipulator.transform_data(
+    df=df_csv,
+    columns=["Force", "Pressure"],
+    transform_func=lambda x: x * 0.9,
+    inplace=True
+)
+print("Data after in-place transformation:\n", df_csv.head())
+
+# 3B) Export as CSV
+manipulator.export_csv(
+    df=df_with_current,
+    file_path="output_data.csv",
+    index=False
+)
+
+# 3C) Export as Excel
+manipulator.export_excel(
+    df=df_with_current,
+    file_path="output_data.xlsx",
+    sheet_name="ProcessedData",
+    index=False
+)
+
+# 3D) Export as Text
+manipulator.export_text(
+    df=df_with_current,
+    file_path="output_data.txt",
+    delimiter="\t",
+    header=True
+)
+
+# 3E) Export as JSON
+manipulator.export_json(
+    df=df_with_current,
+    file_path="output_data.json",
+    orient="records"
+)
+
+################################################################################
+# 4) PLOTTING & REGRESSION (Plotting_Fuctions.py)
+################################################################################
+
+plotter = Plotting_Functions()
+
+# 4A) Histogram
+plotter.plot_histogram(
+    df=df_csv,
+    column="Voltage",
+    bins=50,
+    save_path="voltage_hist.png",
+    title="Voltage Distribution",
+    xlabel="Voltage (V)"
+)
+print("Histogram saved as 'voltage_hist.png'.")
+
+# 4B) Scatter Plot + Regression Overlay
+plotter.plot_scatter(
+    df=df_csv,
+    x_col="Time",
+    y_col="Voltage",
+    save_path="scatter_voltage_time.png",
+    title="Voltage over Time (with Linear Fit)",
+    regression_type="linear"  # Options: "linear", "quadratic", "log"
+)
+print("Scatter plot saved as 'scatter_voltage_time.png'.")
+
+# 4C) Pie Chart
+plotter.plot_pie_chart(
+    df=df_csv,
+    column="Category",
+    save_path="category_pie_chart.png",
+    title="Category Distribution"
+)
+print("Pie chart saved as 'category_pie_chart.png'.")
+
+# 4D) Bar Chart
+plotter.plot_bar_chart(
+    df=df_csv,
+    x_col="Category",
+    y_col="Value",
+    save_path="bar_chart.png",
+    title="Bar Chart Example",
+    xlabel="Category",
+    ylabel="Value"
+)
+print("Bar chart saved as 'bar_chart.png'.")
+
+# 4E) Standalone Regression Parameter Computation
+x_vals = df_csv["Voltage"].dropna().values
+y_vals = df_csv["Current"].dropna().values  # Assuming we computed Current earlier
+reg_info = plotter.compute_regression_parameters(
+    x=x_vals,
+    y=y_vals,
+    regression_type="log"
+)
+print("Regression Parameters (log fit):\n", reg_info)
