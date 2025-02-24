@@ -1,9 +1,43 @@
+import logging
 from typing import Union, List, Optional
 import pandas as pd
+import os
 
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+################################################################################
+# LOGGING SETUP
+################################################################################
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)  # Master log level (everything DEBUG+ is processed)
+
+# FORMATTERS
+console_formatter = logging.Formatter("[%(levelname)s] %(name)s - %(message)s")
+file_formatter = logging.Formatter("[%(asctime)s] [%(levelname)s] %(name)s - %(message)s")
+
+# HANDLERS
+# 1) Console Handler (only INFO+ messages will appear in console)
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.INFO)
+console_handler.setFormatter(console_formatter)
+
+# 2) File Handler (all DEBUG+ messages will be written to the file)
+LOG_FILE = os.path.join(SCRIPT_DIR,"import_functions.log")
+file_handler = logging.FileHandler(LOG_FILE, mode="a", encoding="utf-8")
+file_handler.setLevel(logging.DEBUG)
+file_handler.setFormatter(file_formatter)
+
+# ADD BOTH HANDLERS TO LOGGER
+logger.addHandler(console_handler)
+logger.addHandler(file_handler)
+
+################################################################################
+# IMPORT_FUNCTIONS CLASS
+################################################################################
 class Import_Functions:
     """
-    A class that encapsulates various data-import functions.
+    A class that encapsulates various data-import functions with enhanced logging
+    to both console and file.
     """
 
     def import_csv(
@@ -29,6 +63,7 @@ class Import_Functions:
         :param na_values: Additional strings to recognize as NaN (default is None).
         :return: Pandas DataFrame containing the data from the CSV.
         """
+        logger.debug("Attempting to import CSV from: %s", file_path)
         try:
             df = pd.read_csv(
                 file_path,
@@ -39,13 +74,15 @@ class Import_Functions:
                 encoding=encoding,
                 na_values=na_values
             )
+            logger.info("CSV import successful: '%s' (%d rows).", file_path, len(df))
             return df
         except FileNotFoundError as e:
-            print(f"File not found: {e}")
+            logger.error("File not found: '%s'. Exception: %s", file_path, e)
         except pd.errors.EmptyDataError as e:
-            print(f"No data: {e}")
+            logger.warning("No data found in CSV: '%s'. Exception: %s", file_path, e)
         except Exception as e:
-            print(f"An error occurred while importing the CSV: {e}")
+            logger.exception("Unexpected error importing CSV from '%s'.", file_path)
+
         return pd.DataFrame()
 
     def import_excel(
@@ -66,6 +103,7 @@ class Import_Functions:
         :param parse_dates: List of column names to parse as dates (default is None).
         :return: Pandas DataFrame containing the data from the Excel sheet.
         """
+        logger.debug("Attempting to import Excel from: %s (sheet: %s)", file_path, sheet_name)
         try:
             df = pd.read_excel(
                 file_path,
@@ -74,13 +112,15 @@ class Import_Functions:
                 header=header,
                 parse_dates=parse_dates
             )
+            logger.info("Excel import successful: '%s' (sheet: %s) (%d rows).", file_path, sheet_name, len(df))
             return df
         except FileNotFoundError as e:
-            print(f"File not found: {e}")
+            logger.error("File not found: '%s'. Exception: %s", file_path, e)
         except pd.errors.EmptyDataError as e:
-            print(f"No data in the Excel file: {e}")
+            logger.warning("No data found in Excel file: '%s'. Exception: %s", file_path, e)
         except Exception as e:
-            print(f"An error occurred while importing the Excel file: {e}")
+            logger.exception("Unexpected error importing Excel from '%s'.", file_path)
+
         return pd.DataFrame()
 
     def import_json(
@@ -98,19 +138,18 @@ class Import_Functions:
         :param convert_dates: Whether to attempt parsing date strings (default is False).
         :return: Pandas DataFrame containing the data from the JSON file.
         """
+        logger.debug("Attempting to import JSON from: %s", file_path)
         try:
-            df = pd.read_json(
-                file_path,
-                orient=orient,
-                convert_dates=convert_dates
-            )
+            df = pd.read_json(file_path, orient=orient, convert_dates=convert_dates)
+            logger.info("JSON import successful: '%s' (%d rows).", file_path, len(df))
             return df
         except FileNotFoundError as e:
-            print(f"File not found: {e}")
+            logger.error("File not found: '%s'. Exception: %s", file_path, e)
         except ValueError as e:
-            print(f"Value error with JSON file: {e}")
+            logger.warning("Value error with JSON file: '%s'. Exception: %s", file_path, e)
         except Exception as e:
-            print(f"An error occurred while importing the JSON file: {e}")
+            logger.exception("Unexpected error importing JSON from '%s'.", file_path)
+
         return pd.DataFrame()
 
     def import_text(
@@ -128,40 +167,36 @@ class Import_Functions:
         :param header: If True, interprets the first non-empty line as the column names.
         :return: Pandas DataFrame.
         """
+        logger.debug("Attempting to import Text from: %s", file_path)
+        lines = []
         try:
-            lines = []
             with open(file_path, "r") as file:
                 for line in file:
                     clean_line = line.strip()
-                    # Skip empty lines
                     if not clean_line:
                         continue
-
                     if delimiter:
                         row = clean_line.split(delimiter)
                     else:
-                        # Store the entire line as a single column
                         row = [clean_line]
-
                     lines.append(row)
 
             if not lines:
-                # No data read
-                print("No valid lines found in the text file.")
+                logger.warning("No valid lines found in the text file: '%s'.", file_path)
                 return pd.DataFrame()
 
             if header:
-                # Use first row as column names
                 columns = lines[0]
                 data = lines[1:]
                 df = pd.DataFrame(data, columns=columns)
             else:
                 df = pd.DataFrame(lines)
 
+            logger.info("Text import successful: '%s' (%d rows).", file_path, len(df))
             return df
         except FileNotFoundError as e:
-            print(f"File not found: {e}")
+            logger.error("File not found: '%s'. Exception: %s", file_path, e)
         except Exception as e:
-            print(f"An error occurred while importing the text file: {e}")
+            logger.exception("Unexpected error importing text from '%s'.", file_path)
 
         return pd.DataFrame()

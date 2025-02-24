@@ -229,3 +229,44 @@ reg_info = plotter.compute_regression_parameters(
     regression_type="log"
 )
 print("Regression Parameters (log fit):\n", reg_info)
+
+
+################################################################################
+##Example Usage
+################################################################################
+
+# main.py
+
+from config_manager import ConfigManager
+from Import_Functions import Import_Functions
+from Analysis_Functions import Analysis_Functions
+# ... etc.
+
+def main():
+    # Instantiate the config manager
+    config = ConfigManager("config.yaml")
+
+    # Example: retrieve a default sampling rate for analyzing signals
+    default_sr = config.get("default_sampling_rate", 1000)
+
+    # Pass config values to your classes or directly to function arguments
+    importer = Import_Functions()
+    analysis = Analysis_Functions()
+
+    # Suppose we want to use the default delimiter from config when importing CSV
+    csv_delimiter = config.get("default_csv_delimiter", ",")
+
+    # Use the config in your normal workflow
+    df = importer.import_csv(file_path="some_data.csv", delimiter=csv_delimiter)
+
+    # Analyzing FFT with the default sampling rate
+    fft_results = analysis.analyze_fft(df, columns=["Voltage"], sampling_rate=default_sr)
+
+    # Or read the wavelet default from config
+    wavelet_default = config.get("analysis.wavelet_default", "morl")
+    wavelet_results = analysis.analyze_wavelet(df, columns=["Voltage"], wavelet=wavelet_default)
+
+    print("FFT and wavelet analysis complete!")
+
+if __name__ == "__main__":
+    main()

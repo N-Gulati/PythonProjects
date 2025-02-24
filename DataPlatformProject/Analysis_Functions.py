@@ -1,12 +1,41 @@
+import logging
 import pandas as pd
 import numpy as np
 from scipy.signal import welch, stft, find_peaks, butter, filtfilt
+import os
+
 try:
     import pywt
 except ImportError:
     pywt = None
     print("PyWavelets (pywt) is not installed. Wavelet functionality will be limited.")
 
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+###############################################################################
+# LOGGING SETUP
+###############################################################################
+logger = logging.getLogger(__name__ + "_analysis")
+logger.setLevel(logging.DEBUG)  # Master log level
+
+console_formatter = logging.Formatter("[%(levelname)s] %(name)s - %(message)s")
+file_formatter = logging.Formatter("[%(asctime)s] [%(levelname)s] %(name)s - %(message)s")
+
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.INFO)
+console_handler.setFormatter(console_formatter)
+
+LOG_DIR = os.path.join(SCRIPT_DIR, "analyis_functions.log")
+file_handler = logging.FileHandler(LOG_DIR, mode="a", encoding="utf-8")
+file_handler.setLevel(logging.DEBUG)
+file_handler.setFormatter(file_formatter)
+
+logger.addHandler(console_handler)
+logger.addHandler(file_handler)
+
+###############################################################################
+# ANALYSIS_FUNCTIONS CLASS
+###############################################################################
 class Analysis_Functions:
     """
     A class for performing basic data analysis tasks.
@@ -27,6 +56,7 @@ class Analysis_Functions:
         :param additional_stats: If True, compute extra statistics (e.g. skew, kurtosis).
         :return: A pandas DataFrame or series with descriptive statistics.
         """
+        logger.debug("Starting descriptive_statistics with columns=%s, additional_stats=%s", columns, additional_stats)
 
         if columns is not None:
             # Filter DataFrame to specified columns
@@ -52,6 +82,7 @@ class Analysis_Functions:
             stats_df_t = stats_df_t.join(skew_vals).join(kurt_vals)
             stats_df = stats_df_t.T
 
+        logger.info("Descriptive statistics computed. Shape of result: %s", stats_df.shape)
         return stats_df
     
     def analyze_fft(
@@ -90,6 +121,7 @@ class Analysis_Functions:
                 fft_vals : np.ndarray
                     Magnitude of the FFT for each frequency bin.
         """
+        logger.debug("Starting analyze_fft on columns=%s with sampling_rate=%.2f", columns, sampling_rate)
         results = {}
         for col in columns:
             signal = df[col].values
@@ -108,6 +140,7 @@ class Analysis_Functions:
             
             results[col] = (freq, fft_magnitude)
 
+        logger.info("FFT analysis complete. Processed %d columns.", len(columns))
         return results
 
     def analyze_psd_welch(
@@ -149,11 +182,14 @@ class Analysis_Functions:
                 psd : np.ndarray
                     Power spectral density for each frequency bin.
         """
+        logger.debug("Starting analyze_psd_welch on columns=%s, sampling_rate=%.2f, nperseg=%d", columns, sampling_rate, nperseg)
         results = {}
         for col in columns:
             signal = df[col].dropna().values
             freq, psd = welch(signal, fs=sampling_rate, nperseg=nperseg)
             results[col] = (freq, psd)
+
+        logger.info("Welch PSD analysis complete. Processed %d columns.", len(columns))
         return results
 
     def analyze_stft(
@@ -201,11 +237,15 @@ class Analysis_Functions:
                 Zxx : np.ndarray
                     The STFT of the signal. Each column of Zxx is the FFT of one segment.
         """
+        logger.debug("Starting analyze_stft on columns=%s, sampling_rate=%.2f, nperseg=%d, noverlap=%s",
+                     columns, sampling_rate, nperseg, str(noverlap))
         results = {}
         for col in columns:
             signal = df[col].dropna().values
             f, t, Zxx = stft(signal, fs=sampling_rate, nperseg=nperseg, noverlap=noverlap)
             results[col] = (f, t, Zxx)
+
+        logger.info("STFT analysis complete. Processed %d columns.", len(columns))
         return results
 
     def analyze_wavelet(
@@ -249,8 +289,10 @@ class Analysis_Functions:
                 frequencies : np.ndarray
                     Approximate frequencies corresponding to each scale (may be wavelet-dependent).
         """
+        logger.debug("Starting analyze_wavelet on columns=%s, wavelet='%s'", columns, wavelet)
         if pywt is None:
             print("PyWavelets not installed. Wavelet functionality unavailable.")
+            logger.warning("Wavelet analysis skipped because PyWavelets not installed.")
             return {}
 
         results = {}
@@ -263,11 +305,9 @@ class Analysis_Functions:
 
             cwt_matrix, _ = pywt.cwt(signal, scales, wavelet)
 
-            # Approximate frequencies: depends on wavelet specifics,
-            # but often something like frequency = sampling_rate / scale.
-            # For a simple placeholder, we can return the scale array directly as "frequencies".
             results[col] = (cwt_matrix, scales)
 
+        logger.info("Wavelet analysis complete. Processed %d columns.", len(columns))
         return results
 
     def detect_peaks(
@@ -314,11 +354,15 @@ class Analysis_Functions:
                   'properties': dict of peak properties (e.g., 'peak_heights')
                 }
         """
+        logger.debug("Starting detect_peaks on columns=%s, height=%s, threshold=%s, distance=%s",
+                     columns, str(height), str(threshold), str(distance))
         results = {}
         for col in columns:
             signal = df[col].dropna().values
             peaks, properties = find_peaks(signal, height=height, threshold=threshold, distance=distance)
             results[col] = {"peaks": peaks, "properties": properties}
+
+        logger.info("Peak detection complete. Processed %d columns.", len(columns))
         return results
 
     def filter_data(
@@ -363,18 +407,20 @@ class Analysis_Functions:
         RETURNS:
             A new pd.DataFrame with the filtered data for the specified columns.
         """
+        logger.debug("Starting filter_data on columns=%s with filter_type='%s', cutoff_freq=%.2f, order=%d, sampling_rate=%.2f",
+                     columns, filter_type, cutoff_freq, order, sampling_rate)
         nyquist = 0.5 * sampling_rate
         normalized_cutoff = cutoff_freq / nyquist
 
-        # Build filter
         b, a = butter(order, normalized_cutoff, btype=filter_type, analog=False)
 
-        # Create a copy to hold filtered columns
         df_filtered = df.copy()
 
         for col in columns:
             signal = df[col].dropna().values
             filtered_signal = filtfilt(b, a, signal)
+            # Updating only the valid slice to avoid shape mismatch if some columns differ in length
             df_filtered[col].iloc[:len(filtered_signal)] = filtered_signal
 
+        logger.info("Filtering complete. Processed %d columns.", len(columns))
         return df_filtered

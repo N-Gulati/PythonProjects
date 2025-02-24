@@ -1,0 +1,68 @@
+[2025-02-23 11:09:19,753] [DEBUG] Data_Manipulation_Functions_manipulation - Attempting to export DataFrame to CSV: /Results/Stats.csv
+[2025-02-23 11:09:19,754] [ERROR] Data_Manipulation_Functions_manipulation - Error exporting to CSV: /Results/Stats.csv
+Traceback (most recent call last):
+  File "/home/nicholas-gulati/Documents/PythonProjects/DataPlatformProject/Data_Manipulation_Functions.py", line 158, in export_csv
+    df.to_csv(file_path, index=index, encoding=encoding)
+  File "/home/nicholas-gulati/Documents/PythonProjects/.venv/lib/python3.12/site-packages/pandas/util/_decorators.py", line 333, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nicholas-gulati/Documents/PythonProjects/.venv/lib/python3.12/site-packages/pandas/core/generic.py", line 3967, in to_csv
+    return DataFrameRenderer(formatter).to_csv(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nicholas-gulati/Documents/PythonProjects/.venv/lib/python3.12/site-packages/pandas/io/formats/format.py", line 1014, in to_csv
+    csv_formatter.save()
+  File "/home/nicholas-gulati/Documents/PythonProjects/.venv/lib/python3.12/site-packages/pandas/io/formats/csvs.py", line 251, in save
+    with get_handle(
+         ^^^^^^^^^^^
+  File "/home/nicholas-gulati/Documents/PythonProjects/.venv/lib/python3.12/site-packages/pandas/io/common.py", line 749, in get_handle
+    check_parent_directory(str(handle))
+  File "/home/nicholas-gulati/Documents/PythonProjects/.venv/lib/python3.12/site-packages/pandas/io/common.py", line 616, in check_parent_directory
+    raise OSError(rf"Cannot save file into a non-existent directory: '{parent}'")
+OSError: Cannot save file into a non-existent directory: '/Results'
+[2025-02-23 11:21:06,431] [DEBUG] Data_Manipulation_Functions_manipulation - Attempting to export DataFrame to CSV: /Results/Stats.csv
+[2025-02-23 11:21:06,432] [ERROR] Data_Manipulation_Functions_manipulation - Error exporting to CSV: /Results/Stats.csv
+Traceback (most recent call last):
+  File "/home/nicholas-gulati/Documents/PythonProjects/DataPlatformProject/Data_Manipulation_Functions.py", line 158, in export_csv
+    df.to_csv(file_path, index=index, encoding=encoding)
+  File "/home/nicholas-gulati/Documents/PythonProjects/.venv/lib/python3.12/site-packages/pandas/util/_decorators.py", line 333, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nicholas-gulati/Documents/PythonProjects/.venv/lib/python3.12/site-packages/pandas/core/generic.py", line 3967, in to_csv
+    return DataFrameRenderer(formatter).to_csv(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nicholas-gulati/Documents/PythonProjects/.venv/lib/python3.12/site-packages/pandas/io/formats/format.py", line 1014, in to_csv
+    csv_formatter.save()
+  File "/home/nicholas-gulati/Documents/PythonProjects/.venv/lib/python3.12/site-packages/pandas/io/formats/csvs.py", line 251, in save
+    with get_handle(
+         ^^^^^^^^^^^
+  File "/home/nicholas-gulati/Documents/PythonProjects/.venv/lib/python3.12/site-packages/pandas/io/common.py", line 749, in get_handle
+    check_parent_directory(str(handle))
+  File "/home/nicholas-gulati/Documents/PythonProjects/.venv/lib/python3.12/site-packages/pandas/io/common.py", line 616, in check_parent_directory
+    raise OSError(rf"Cannot save file into a non-existent directory: '{parent}'")
+OSError: Cannot save file into a non-existent directory: '/Results'
+[2025-02-23 11:21:23,619] [DEBUG] Data_Manipulation_Functions_manipulation - Attempting to export DataFrame to CSV: \Results\Stats.csv
+[2025-02-23 11:21:23,620] [INFO] Data_Manipulation_Functions_manipulation - Data successfully exported to CSV at '\Results\Stats.csv'.
+[2025-02-23 11:23:22,020] [DEBUG] Data_Manipulation_Functions_manipulation - Attempting to export DataFrame to CSV: \Results\Stats.csv
+[2025-02-23 11:23:22,024] [INFO] Data_Manipulation_Functions_manipulation - Data successfully exported to CSV at '\Results\Stats.csv'.
+[2025-02-23 11:23:50,293] [DEBUG] Data_Manipulation_Functions_manipulation - Attempting to export DataFrame to CSV: /home/nicholas-gulati/Documents/PythonProjects/DataPlatformProject/Results
+[2025-02-23 11:23:50,295] [ERROR] Data_Manipulation_Functions_manipulation - Error exporting to CSV: /home/nicholas-gulati/Documents/PythonProjects/DataPlatformProject/Results
+Traceback (most recent call last):
+  File "/home/nicholas-gulati/Documents/PythonProjects/DataPlatformProject/Data_Manipulation_Functions.py", line 158, in export_csv
+    df.to_csv(file_path, index=index, encoding=encoding)
+  File "/home/nicholas-gulati/Documents/PythonProjects/.venv/lib/python3.12/site-packages/pandas/util/_decorators.py", line 333, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nicholas-gulati/Documents/PythonProjects/.venv/lib/python3.12/site-packages/pandas/core/generic.py", line 3967, in to_csv
+    return DataFrameRenderer(formatter).to_csv(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nicholas-gulati/Documents/PythonProjects/.venv/lib/python3.12/site-packages/pandas/io/formats/format.py", line 1014, in to_csv
+    csv_formatter.save()
+  File "/home/nicholas-gulati/Documents/PythonProjects/.venv/lib/python3.12/site-packages/pandas/io/formats/csvs.py", line 251, in save
+    with get_handle(
+         ^^^^^^^^^^^
+  File "/home/nicholas-gulati/Documents/PythonProjects/.venv/lib/python3.12/site-packages/pandas/io/common.py", line 873, in get_handle
+    handle = open(
+             ^^^^^
+IsADirectoryError: [Errno 21] Is a directory: '/home/nicholas-gulati/Documents/PythonProjects/DataPlatformProject/Results'
+[2025-02-23 11:24:35,093] [DEBUG] Data_Manipulation_Functions_manipulation - Attempting to export DataFrame to CSV: /home/nicholas-gulati/Documents/PythonProjects/DataPlatformProject/Results/Stats.csv
+[2025-02-23 11:24:35,097] [INFO] Data_Manipulation_Functions_manipulation - Data successfully exported to CSV at '/home/nicholas-gulati/Documents/PythonProjects/DataPlatformProject/Results/Stats.csv'.

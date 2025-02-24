@@ -1,4 +1,38 @@
+import logging
+from typing import Union, List, Optional
 import pandas as pd
+import os
+
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+################################################################################
+# LOGGING SETUP
+################################################################################
+logger = logging.getLogger(__name__ + "_manipulation")
+logger.setLevel(logging.DEBUG)  # Master log level
+
+# FORMATTERS
+console_formatter = logging.Formatter("[%(levelname)s] %(name)s - %(message)s")
+file_formatter = logging.Formatter("[%(asctime)s] [%(levelname)s] %(name)s - %(message)s")
+
+# CONSOLE HANDLER (INFO+ on console)
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.INFO)
+console_handler.setFormatter(console_formatter)
+
+# FILE HANDLER (DEBUG+ to file)
+LOG_DIR = os.path.join(SCRIPT_DIR, "data_manipulation.log")
+file_handler = logging.FileHandler(LOG_DIR, mode="a", encoding="utf-8")
+file_handler.setLevel(logging.DEBUG)
+file_handler.setFormatter(file_formatter)
+
+# ADD HANDLERS
+logger.addHandler(console_handler)
+logger.addHandler(file_handler)
+
+################################################################################
+# DATA_MANIPULATION_FUNCTIONS CLASS
+################################################################################
 
 class Data_Manipulation_Functions:
     """
@@ -49,10 +83,18 @@ class Data_Manipulation_Functions:
 
         RETURNS:
             A pd.DataFrame (modified in place if inplace=True, or a copy otherwise).
+        
+        Enhanced Logging:
+            - Logs debug info about which columns are being transformed.
+            - Logs info about successful transformations or any exceptions.
         """
+        logger.debug("Starting transform_data on columns: %s", columns)
+
         if not isinstance(columns, list):
+            logger.error("`columns` must be a list. Received: %s", type(columns).__name__)
             raise ValueError("columns must be a list of column names.")
 
+        # Decide whether to work on a copy or modify in place
         if inplace:
             df_out = df
         else:
@@ -60,17 +102,23 @@ class Data_Manipulation_Functions:
 
         for col in columns:
             if col not in df_out.columns:
+                logger.error("Column '%s' does not exist in the DataFrame.", col)
                 raise ValueError(f"Column '{col}' does not exist in the DataFrame.")
+            try:
+                if new_column_name and len(columns) == 1:
+                    # Single column => place the result in the new column
+                    logger.debug("Applying transform_func to column '%s'; results in '%s'.", col, new_column_name)
+                    df_out[new_column_name] = df_out[col].apply(transform_func)
+                else:
+                    logger.debug("Applying transform_func in place to column '%s'.", col)
+                    df_out[col] = df_out[col].apply(transform_func)
+            except Exception as e:
+                logger.exception("Error while transforming column '%s'.", col)
+                raise e
 
-            if new_column_name and len(columns) == 1:
-                # Single column => place the result in the new column
-                df_out[new_column_name] = df_out[col].apply(transform_func)
-            else:
-                # Overwrite the column
-                df_out[col] = df_out[col].apply(transform_func)
-
+        logger.info("Data transformation complete on columns: %s", columns)
         return df_out
-
+    
     def export_csv(
         self,
         df: pd.DataFrame,
@@ -105,11 +153,12 @@ class Data_Manipulation_Functions:
         RETURNS:
             None. The DataFrame is written to the specified file path.
         """
+        logger.debug("Attempting to export DataFrame to CSV: %s", file_path)
         try:
             df.to_csv(file_path, index=index, encoding=encoding)
-            print(f"Data successfully exported to CSV at '{file_path}'.")
+            logger.info("Data successfully exported to CSV at '%s'.", file_path)
         except Exception as e:
-            print(f"Error exporting to CSV: {e}")
+            logger.exception("Error exporting to CSV: %s", file_path)
 
     def export_excel(
         self,
@@ -146,11 +195,12 @@ class Data_Manipulation_Functions:
         RETURNS:
             None. The DataFrame is written to the specified file path.
         """
+        logger.debug("Attempting to export DataFrame to Excel: %s (sheet: %s)", file_path, sheet_name)
         try:
             df.to_excel(file_path, sheet_name=sheet_name, index=index)
-            print(f"Data successfully exported to Excel at '{file_path}'.")
+            logger.info("Data successfully exported to Excel at '%s' (sheet: %s).", file_path, sheet_name)
         except Exception as e:
-            print(f"Error exporting to Excel: {e}")
+            logger.exception("Error exporting to Excel: %s", file_path)
 
     def export_text(
         self,
@@ -186,12 +236,12 @@ class Data_Manipulation_Functions:
         RETURNS:
             None. Writes the DataFrame to the specified text file.
         """
+        logger.debug("Attempting to export DataFrame to text: %s (delimiter='%s')", file_path, delimiter)
         try:
-            # Use to_csv under the hood, but specify a custom delimiter
             df.to_csv(file_path, sep=delimiter, index=False, header=header)
-            print(f"Data successfully exported to text file at '{file_path}'.")
+            logger.info("Data successfully exported to text file at '%s'.", file_path)
         except Exception as e:
-            print(f"Error exporting to text file: {e}")
+            logger.exception("Error exporting to text file: %s", file_path)
 
     def export_json(
         self,
@@ -227,8 +277,9 @@ class Data_Manipulation_Functions:
         RETURNS:
             None. Writes the DataFrame to the specified JSON file.
         """
+        logger.debug("Attempting to export DataFrame to JSON: %s (orient='%s')", file_path, orient)
         try:
             df.to_json(file_path, orient=orient, date_format=date_format)
-            print(f"Data successfully exported to JSON at '{file_path}'.")
+            logger.info("Data successfully exported to JSON at '%s'.", file_path)
         except Exception as e:
-            print(f"Error exporting to JSON: {e}")
+            logger.exception("Error exporting to JSON: %s", file_path)

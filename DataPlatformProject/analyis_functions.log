@@ -1,0 +1,50 @@
+[2025-02-23 11:07:11,666] [DEBUG] Analysis_Functions_analysis - Starting descriptive_statistics with columns=['Voltage'], additional_stats=False
+[2025-02-23 11:07:11,679] [INFO] Analysis_Functions_analysis - Descriptive statistics computed. Shape of result: (8, 1)
+[2025-02-23 11:09:19,748] [DEBUG] Analysis_Functions_analysis - Starting descriptive_statistics with columns=['Voltage'], additional_stats=False
+[2025-02-23 11:09:19,753] [INFO] Analysis_Functions_analysis - Descriptive statistics computed. Shape of result: (8, 1)
+[2025-02-23 11:11:35,842] [DEBUG] Analysis_Functions_analysis - Starting descriptive_statistics with columns=['Voltage'], additional_stats=False
+[2025-02-23 11:11:35,853] [INFO] Analysis_Functions_analysis - Descriptive statistics computed. Shape of result: (8, 1)
+[2025-02-23 11:13:05,215] [DEBUG] Analysis_Functions_analysis - Starting descriptive_statistics with columns=['Voltage'], additional_stats=False
+[2025-02-23 11:13:05,235] [INFO] Analysis_Functions_analysis - Descriptive statistics computed. Shape of result: (8, 1)
+[2025-02-23 11:13:31,601] [DEBUG] Analysis_Functions_analysis - Starting descriptive_statistics with columns=['Voltage'], additional_stats=False
+[2025-02-23 11:13:31,620] [INFO] Analysis_Functions_analysis - Descriptive statistics computed. Shape of result: (8, 1)
+[2025-02-23 11:14:19,485] [DEBUG] Analysis_Functions_analysis - Starting descriptive_statistics with columns=['Voltage'], additional_stats=False
+[2025-02-23 11:14:19,493] [INFO] Analysis_Functions_analysis - Descriptive statistics computed. Shape of result: (8, 1)
+[2025-02-23 11:17:16,505] [DEBUG] Analysis_Functions_analysis - Starting descriptive_statistics with columns=['Voltage'], additional_stats=False
+[2025-02-23 11:17:16,509] [INFO] Analysis_Functions_analysis - Descriptive statistics computed. Shape of result: (8, 1)
+[2025-02-23 11:18:20,354] [DEBUG] Analysis_Functions_analysis - Starting descriptive_statistics with columns=['Voltage'], additional_stats=False
+[2025-02-23 11:18:20,358] [INFO] Analysis_Functions_analysis - Descriptive statistics computed. Shape of result: (8, 1)
+[2025-02-23 11:20:42,974] [DEBUG] Analysis_Functions_analysis - Starting descriptive_statistics with columns=['Voltage'], additional_stats=False
+[2025-02-23 11:20:42,978] [INFO] Analysis_Functions_analysis - Descriptive statistics computed. Shape of result: (8, 1)
+[2025-02-23 11:21:06,427] [DEBUG] Analysis_Functions_analysis - Starting descriptive_statistics with columns=['Voltage'], additional_stats=False
+[2025-02-23 11:21:06,431] [INFO] Analysis_Functions_analysis - Descriptive statistics computed. Shape of result: (8, 1)
+[2025-02-23 11:21:23,615] [DEBUG] Analysis_Functions_analysis - Starting descriptive_statistics with columns=['Voltage'], additional_stats=False
+[2025-02-23 11:21:23,619] [INFO] Analysis_Functions_analysis - Descriptive statistics computed. Shape of result: (8, 1)
+[2025-02-23 11:23:22,011] [DEBUG] Analysis_Functions_analysis - Starting descriptive_statistics with columns=['Voltage'], additional_stats=False
+[2025-02-23 11:23:22,020] [INFO] Analysis_Functions_analysis - Descriptive statistics computed. Shape of result: (8, 1)
+[2025-02-23 11:23:50,288] [DEBUG] Analysis_Functions_analysis - Starting descriptive_statistics with columns=['Voltage'], additional_stats=False
+[2025-02-23 11:23:50,293] [INFO] Analysis_Functions_analysis - Descriptive statistics computed. Shape of result: (8, 1)
+[2025-02-23 11:24:35,080] [DEBUG] Analysis_Functions_analysis - Starting descriptive_statistics with columns=['Voltage'], additional_stats=False
+[2025-02-23 11:24:35,092] [INFO] Analysis_Functions_analysis - Descriptive statistics computed. Shape of result: (8, 1)
+[2025-02-23 11:33:55,200] [DEBUG] Analysis_Functions_analysis - Starting descriptive_statistics with columns=['Voltage'], additional_stats=False
+[2025-02-23 11:33:55,205] [INFO] Analysis_Functions_analysis - Descriptive statistics computed. Shape of result: (8, 1)
+[2025-02-23 11:35:50,216] [DEBUG] Analysis_Functions_analysis - Starting descriptive_statistics with columns=['Voltage'], additional_stats=False
+[2025-02-23 11:35:50,220] [INFO] Analysis_Functions_analysis - Descriptive statistics computed. Shape of result: (8, 1)
+[2025-02-23 11:40:10,613] [DEBUG] Analysis_Functions_analysis - Starting descriptive_statistics with columns=['Voltage'], additional_stats=False
+[2025-02-23 11:40:10,617] [INFO] Analysis_Functions_analysis - Descriptive statistics computed. Shape of result: (8, 1)
+[2025-02-23 11:40:31,873] [DEBUG] Analysis_Functions_analysis - Starting descriptive_statistics with columns=['Voltage'], additional_stats=False
+[2025-02-23 11:40:31,878] [INFO] Analysis_Functions_analysis - Descriptive statistics computed. Shape of result: (8, 1)
+[2025-02-23 11:40:31,878] [DEBUG] Analysis_Functions_analysis - Starting analyze_fft on columns=['Voltage'] with sampling_rate=200.00
+[2025-02-23 11:40:31,883] [INFO] Analysis_Functions_analysis - FFT analysis complete. Processed 1 columns.
+[2025-02-23 11:43:00,168] [DEBUG] Analysis_Functions_analysis - Starting descriptive_statistics with columns=['Voltage'], additional_stats=False
+[2025-02-23 11:43:00,171] [INFO] Analysis_Functions_analysis - Descriptive statistics computed. Shape of result: (8, 1)
+[2025-02-23 11:43:00,171] [DEBUG] Analysis_Functions_analysis - Starting analyze_fft on columns=['Voltage'] with sampling_rate=200.00
+[2025-02-23 11:43:00,172] [INFO] Analysis_Functions_analysis - FFT analysis complete. Processed 1 columns.
+[2025-02-23 11:48:43,830] [DEBUG] Analysis_Functions_analysis - Starting descriptive_statistics with columns=['Voltage'], additional_stats=False
+[2025-02-23 11:48:43,833] [INFO] Analysis_Functions_analysis - Descriptive statistics computed. Shape of result: (8, 1)
+[2025-02-23 11:48:43,833] [DEBUG] Analysis_Functions_analysis - Starting analyze_fft on columns=['Voltage'] with sampling_rate=200.00
+[2025-02-23 11:48:43,834] [INFO] Analysis_Functions_analysis - FFT analysis complete. Processed 1 columns.
+[2025-02-23 11:51:02,140] [DEBUG] Analysis_Functions_analysis - Starting descriptive_statistics with columns=['Voltage'], additional_stats=False
+[2025-02-23 11:51:02,145] [INFO] Analysis_Functions_analysis - Descriptive statistics computed. Shape of result: (8, 1)
+[2025-02-23 11:51:02,145] [DEBUG] Analysis_Functions_analysis - Starting analyze_fft on columns=['Voltage'] with sampling_rate=200.00
+[2025-02-23 11:51:02,145] [INFO] Analysis_Functions_analysis - FFT analysis complete. Processed 1 columns.

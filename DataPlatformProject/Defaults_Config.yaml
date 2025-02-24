@@ -1,0 +1,129 @@
+################################################################################
+# Example Defaults Config for the Entire Data Platform
+################################################################################
+
+import_functions:
+  # 1) CSV
+  import_csv:
+    delimiter: ","
+    header: "infer"
+    usecols: null
+    parse_dates: null
+    encoding: null
+    na_values: null
+
+  # 2) Excel
+  import_excel:
+    sheet_name: 0
+    usecols: null
+    header: 0
+    parse_dates: null
+
+  # 3) JSON
+  import_json:
+    orient: null
+    convert_dates: false
+
+  # 4) Text
+  import_text:
+    delimiter: null
+    header: false
+
+data_manipulation:
+  # 1) Transform Data
+  transform_data:
+    new_column_name: null
+    inplace: false
+
+  # 2) Export CSV
+  export_csv:
+    index: false
+    encoding: "utf-8"
+
+  # 3) Export Excel
+  export_excel:
+    sheet_name: "Sheet1"
+    index: false
+
+  # 4) Export Text
+  export_text:
+    delimiter: "\t"
+    header: true
+
+  # 5) Export JSON
+  export_json:
+    orient: "records"
+    date_format: "iso"
+
+analysis_functions:
+  # 1) Descriptive Stats
+  descriptive_statistics:
+    columns: null
+    additional_stats: false
+
+  # 2) FFT
+  analyze_fft:
+    sampling_rate: 1.0
+
+  # 3) PSD (Welch)
+  analyze_psd_welch:
+    sampling_rate: 1.0
+    nperseg: 256
+
+  # 4) STFT
+  analyze_stft:
+    sampling_rate: 1.0
+    nperseg: 256
+    noverlap: null
+
+  # 5) Wavelet
+  analyze_wavelet:
+    wavelet: "morl"
+    scales: null
+
+  # 6) Peak Detection
+  detect_peaks:
+    height: null
+    threshold: null
+    distance: null
+
+  # 7) Filter
+  filter_data:
+    filter_type: "lowpass"
+    cutoff_freq: 1.0
+    order: 4
+    sampling_rate: 1.0
+
+plotting_functions:
+  # 1) Histogram
+  plot_histogram:
+    bins: 30
+    save_path: "histogram.png"
+    title: "Histogram"
+    xlabel: null
+    ylabel: "Frequency"
+
+  # 2) Scatter
+  plot_scatter:
+    save_path: "scatter.png"
+    title: "Scatter Plot"
+    xlabel: null
+    ylabel: null
+    regression_type: null
+
+  # 3) Pie Chart
+  plot_pie_chart:
+    save_path: "pie_chart.png"
+    title: "Pie Chart"
+    labels: null
+
+  # 4) Bar Chart
+  plot_bar_chart:
+    save_path: "bar_chart.png"
+    title: "Bar Chart"
+    xlabel: null
+    ylabel: null
+
+  # 5) Regression Params
+  compute_regression_parameters:
+    regression_type: "linear"

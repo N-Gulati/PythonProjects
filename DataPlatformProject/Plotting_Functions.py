@@ -1,7 +1,39 @@
+import logging
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+###############################################################################
+# LOGGING SETUP
+###############################################################################
+logger = logging.getLogger(__name__ + "_plotting")
+logger.setLevel(logging.DEBUG)  # Master log level: everything DEBUG+ is processed
+
+# FORMATTERS
+console_formatter = logging.Formatter("[%(levelname)s] %(name)s - %(message)s")
+file_formatter = logging.Formatter("[%(asctime)s] [%(levelname)s] %(name)s - %(message)s")
+
+# CONSOLE HANDLER (only shows INFO+ in console)
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.INFO)
+console_handler.setFormatter(console_formatter)
+
+# FILE HANDLER (writes DEBUG+ to file)
+LOG_DIR = os.path.join(SCRIPT_DIR, "plotting_functions.log")
+file_handler = logging.FileHandler(LOG_DIR, mode="a", encoding="utf-8")
+file_handler.setLevel(logging.DEBUG)
+file_handler.setFormatter(file_formatter)
+
+# ADD HANDLERS TO LOGGER
+logger.addHandler(console_handler)
+logger.addHandler(file_handler)
+
+###############################################################################
+# PLOTTING_FUNCTIONS CLASS
+###############################################################################
 class Plotting_Functions:
     """
     A class to handle plotting and regression-related visualization needs
@@ -52,7 +84,9 @@ class Plotting_Functions:
         RETURNS:
             None. The figure is saved to 'save_path'.
         """
+        logger.debug("Starting plot_histogram for column '%s' with %d bins", column, bins)
         data = df[column].dropna()
+
         plt.figure(figsize=(8, 6))
         plt.hist(data, bins=bins, alpha=0.7, edgecolor='black')
         plt.title(title)
@@ -61,6 +95,7 @@ class Plotting_Functions:
         plt.grid(axis='y', alpha=0.75)
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
         plt.close()
+        logger.info("Histogram saved to '%s' for column '%s'.", save_path, column)
 
     def plot_scatter(
         self,
@@ -109,6 +144,9 @@ class Plotting_Functions:
         RETURNS:
             None. The figure is saved to 'save_path'.
         """
+        logger.debug("Starting plot_scatter with x_col='%s', y_col='%s', regression='%s'",
+                     x_col, y_col, regression_type)
+
         x_data = df[x_col].dropna().values
         y_data = df[y_col].dropna().values
 
@@ -120,11 +158,9 @@ class Plotting_Functions:
 
         if regression_type is not None:
             if regression_type.lower() in ["linear", "quadratic", "log"]:
-                # Compute regression parameters and the fitted curve
                 fit_params = self.compute_regression_parameters(x_data, y_data, regression_type.lower())
-
-                # Plot the fitted curve
                 x_sorted = np.sort(x_data)
+
                 if regression_type.lower() == "linear":
                     slope, intercept = fit_params["params"]
                     y_fit = slope * x_sorted + intercept
@@ -132,7 +168,6 @@ class Plotting_Functions:
                     a, b, c = fit_params["params"]
                     y_fit = a * x_sorted**2 + b * x_sorted + c
                 elif regression_type.lower() == "log":
-                    # log fit => y = a + b*ln(x), so we must handle x>0
                     x_sorted_positive = x_sorted[x_sorted > 0]
                     if len(x_sorted_positive) == 0:
                         print("Cannot plot log regression because all x-values are <= 0.")
@@ -140,8 +175,8 @@ class Plotting_Functions:
                     else:
                         slope, intercept = fit_params["params"]
                         y_fit = intercept + slope * np.log(x_sorted_positive)
-                        # Switch to that subset for plotting
                         x_sorted = x_sorted_positive
+
                 if y_fit is not None:
                     plt.plot(x_sorted, y_fit, color='red', label=f"{regression_type.capitalize()} Fit")
                     plt.legend()
@@ -150,6 +185,7 @@ class Plotting_Functions:
 
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
         plt.close()
+        logger.info("Scatter plot saved to '%s' (x_col='%s', y_col='%s').", save_path, x_col, y_col)
 
     def plot_pie_chart(
         self,
@@ -188,27 +224,27 @@ class Plotting_Functions:
         RETURNS:
             None. The figure is saved to 'save_path'.
         """
+        logger.debug("Starting plot_pie_chart for column '%s'", column)
         data = df[column].dropna()
-        
+
         # If column is numeric with many unique values, user might want to group them first
         # or pass in a pre-aggregated Series. For simplicity, let's assume it is categorical or aggregated.
         if pd.api.types.is_numeric_dtype(data):
-            # Convert numeric data to a value counts approach (e.g., each value is a category).
             counts = data.value_counts()
             labels_for_pie = labels if labels else counts.index.tolist()
             values_for_pie = counts.values
         else:
-            # For categorical data, get value counts
             counts = data.value_counts()
             labels_for_pie = labels if labels else counts.index.tolist()
             values_for_pie = counts.values
-        
+
         plt.figure(figsize=(8, 6))
         plt.title(title)
         plt.pie(values_for_pie, labels=labels_for_pie, autopct='%1.1f%%', startangle=140)
         plt.axis('equal')  # Equal aspect ratio ensures the pie is drawn as a circle
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
         plt.close()
+        logger.info("Pie chart saved to '%s' for column '%s'.", save_path, column)
 
     def plot_bar_chart(
         self,
@@ -253,8 +289,7 @@ class Plotting_Functions:
         RETURNS:
             None. The figure is saved to 'save_path'.
         """
-        # If data is not aggregated, consider grouping. For this simple example, we assume
-        # y_col is already aggregated or that each x_col entry has a single y_col value.
+        logger.debug("Starting plot_bar_chart with x_col='%s', y_col='%s'", x_col, y_col)
         x_data = df[x_col].astype(str)  # Ensure string categories
         y_data = df[y_col].values
 
@@ -267,6 +302,7 @@ class Plotting_Functions:
         plt.tight_layout()
         plt.savefig(save_path, dpi=300)
         plt.close()
+        logger.info("Bar chart saved to '%s' (x_col='%s', y_col='%s').", save_path, x_col, y_col)
 
     def compute_regression_parameters(
         self,
@@ -306,35 +342,116 @@ class Plotting_Functions:
 
             Where 'params' can be (slope, intercept) for linear/log, or (a, b, c) for quadratic.
         """
-        # Ensure no NaNs (keep indices consistent)
+        logger.debug("Computing %s regression parameters for x, y arrays of size %d, %d",
+                     regression_type, len(x), len(y))
+
         valid_idx = ~np.isnan(x) & ~np.isnan(y)
         x = x[valid_idx]
         y = y[valid_idx]
 
         if regression_type == "linear":
-            # y = mx + b
             slope, intercept = np.polyfit(x, y, 1)
             print(f"Linear Regression: y = {slope:.4f}x + {intercept:.4f}")
+            logger.info("Linear regression parameters: slope=%.4f, intercept=%.4f", slope, intercept)
             return {"type": "linear", "params": (slope, intercept)}
 
         elif regression_type == "quadratic":
-            # y = ax^2 + bx + c
             a, b, c = np.polyfit(x, y, 2)
             print(f"Quadratic Regression: y = {a:.4f}x^2 + {b:.4f}x + {c:.4f}")
+            logger.info("Quadratic regression parameters: a=%.4f, b=%.4f, c=%.4f", a, b, c)
             return {"type": "quadratic", "params": (a, b, c)}
 
         elif regression_type == "log":
-            # y = a + b ln(x)
-            # => y vs ln(x): slope = b, intercept = a
             x_positive_idx = x > 0
             if not np.any(x_positive_idx):
                 print("All x values are non-positive. Cannot perform log regression.")
+                logger.warning("Cannot perform log regression. All x values <= 0.")
                 return {"type": "log", "params": None}
             x_log = np.log(x[x_positive_idx])
             y_log = y[x_positive_idx]
             slope, intercept = np.polyfit(x_log, y_log, 1)
             print(f"Log Regression: y = {intercept:.4f} + {slope:.4f} ln(x)")
+            logger.info("Log regression parameters: slope=%.4f, intercept=%.4f", slope, intercept)
             return {"type": "log", "params": (slope, intercept)}
 
         else:
+            logger.error("Invalid regression_type specified: %s", regression_type)
             raise ValueError("Invalid regression_type. Choose from {'linear', 'quadratic', 'log'}.")
+        
+    def plot_fft_spectrum(
+        self,
+        fft_results: dict,
+        columns: list = None,
+        save_path: str = "fft_spectrum.png",
+        title: str = "FFT Spectrum",
+        xlabel: str = "Frequency (Hz)",
+        ylabel: str = "Amplitude"
+    ):
+        """
+        Plots frequency-domain data from an FFT analysis, as returned by analyze_fft.
+
+        WHAT IT IS:
+            A line plot of the frequency bins (x-axis) versus the FFT magnitude or amplitude (y-axis).
+
+        WHAT IT'S GOOD FOR:
+            - Visualizing the frequency components of signals processed by analyze_fft.
+            - Comparing multiple signals in the same frequency domain plot.
+
+        CAVEATS:
+            - If columns have drastically different amplitude scales, consider plotting them separately
+            or using a log scale (plt.yscale('log')).
+            - This function assumes fft_results is a dict where each key is a column name
+            and the value is (freq, fft_magnitude). Example:
+                fft_results["Voltage"] => (freq_array, magnitude_array)
+            - If your signals are non-stationary or have time-dependent frequency content,
+            consider an STFT or wavelet transform and a different plot function.
+
+        PARAMETERS:
+            fft_results : dict
+                Dictionary returned by analyze_fft. Example structure:
+                    {
+                    "ColumnName1": (freq_array, fft_magnitude_array),
+                    "ColumnName2": (freq_array, fft_magnitude_array),
+                    ...
+                    }
+            columns : list, optional
+                A list of columns (keys in fft_results) to plot. If None, plots all keys.
+            save_path : str, default "fft_spectrum.png"
+                File path where the FFT spectrum plot will be saved.
+            title : str, default "FFT Spectrum"
+                Plot title.
+            xlabel : str, default "Frequency (Hz)"
+                Label for the x-axis.
+            ylabel : str, default "Amplitude"
+                Label for the y-axis.
+
+        RETURNS:
+            None. The figure is saved to 'save_path'.
+        """
+        import matplotlib.pyplot as plt
+        
+        # If columns not specified, plot all columns in fft_results
+        if columns is None:
+            columns = list(fft_results.keys())
+
+        plt.figure(figsize=(8, 6))
+
+        for col in columns:
+            logger.debug(f'Starting a FFT of columns {columns}')
+            if col not in fft_results:
+                logger.debug(f"Warning: '{col}' not found in fft_results. Skipping.")
+                continue
+
+            freq, magnitude = fft_results[col]
+            # Plot magnitude vs frequency
+            plt.plot(freq, magnitude, label=col)
+
+        plt.title(title)
+        plt.xlabel(xlabel)
+        plt.ylabel(ylabel)
+        plt.legend()
+        plt.grid(True, alpha=0.3)
+        plt.savefig(save_path, dpi=300, bbox_inches='tight')
+        plt.close()
+        logger.info(f"FFT spectrum plot saved to '{save_path}'.")
+
